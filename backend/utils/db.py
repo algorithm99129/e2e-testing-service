@@ -109,6 +109,29 @@ def fetch_test_cases(db_name: str = DB_NAME) -> List[Dict[str, str]]:
     return cases_json
 
 
+def fetch_test_case(test_id: int, db_name: str = DB_NAME) -> List[Dict[str, str]]:
+    """Fetch specific test case."""
+    with sqlite3.connect(db_name) as conn:
+        with closing(conn.cursor()) as cursor:
+            cursor.execute(
+                "SELECT id, description, status, no_of_steps FROM test_cases WHERE test_id = ?",
+                (test_id,),
+            )
+            cases = cursor.fetchall()
+            cases_json = [
+                {
+                    "id": case[0],
+                    "description": case[1],
+                    "status": case[2],
+                    "no_of_steps": case[3],
+                }
+                for case in cases
+            ]
+    if len(cases_json) > 0:
+        return cases_json[0]
+    return None
+
+
 def update_test_case_status(test_id, status, db_name=DB_NAME):
     """Update the status of a specific test case."""
     with sqlite3.connect(db_name) as conn:

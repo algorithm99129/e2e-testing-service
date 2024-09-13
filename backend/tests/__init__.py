@@ -1,6 +1,7 @@
 import logging
 import multiprocessing
 from logging.handlers import QueueHandler, QueueListener
+from e2e_test_agent.e2e_test_agent import E2eTestingAgent
 from utils.db import delete_test_logs, update_test_case_status
 from utils.log_handler import SQLiteHandler
 import subprocess
@@ -72,3 +73,10 @@ def run_test(test_id):
     process = multiprocessing.Process(target=test_process, args=(queue, test_id))
     process.start()
     process.join()
+
+
+async def run_test_with_agent(test_case):
+    topic = test_case["description"]
+
+    e2e_test_agent = E2eTestingAgent()
+    await e2e_test_agent.ainvoke(topic)
